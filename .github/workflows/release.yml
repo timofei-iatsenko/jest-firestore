@@ -25,11 +25,6 @@ jobs:
           yarn install
           yarn build
 
-      - name: Install release-it globally
-        run: |
-          npm i -g release-it@16.2.1
-          npm i -g @release-it/conventional-changelog@7.0.2
-
       - name: git config
         run: |
           git config user.name "${GITHUB_ACTOR}"
