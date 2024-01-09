@@ -1,5 +1,5 @@
-import {type Firestore, getFirestore} from 'firebase-admin/firestore';
-import {initializeApp} from 'firebase-admin/app';
+import { type Firestore, getFirestore } from 'firebase-admin/firestore';
+import { initializeApp } from 'firebase-admin/app';
 
 describe('insert', () => {
   let firestore: Firestore;
@@ -12,8 +12,8 @@ describe('insert', () => {
   it('should insert a doc into collection', async () => {
     const users = firestore.collection('users');
 
-    const mockUser = {_id: 'some-user-id', name: 'John'};
-    const {id} = await users.add(mockUser);
+    const mockUser = { _id: 'some-user-id', name: 'John' };
+    const { id } = await users.add(mockUser);
 
     const insertedUser = await users.doc(id).get();
 

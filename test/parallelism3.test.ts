@@ -1,5 +1,5 @@
-import {type Firestore, getFirestore} from 'firebase-admin/firestore';
-import {initializeApp} from 'firebase-admin/app';
+import { type Firestore, getFirestore } from 'firebase-admin/firestore';
+import { initializeApp } from 'firebase-admin/app';
 
 describe('parallelism: third worker', () => {
   let firestore: Firestore;
@@ -13,7 +13,11 @@ describe('parallelism: third worker', () => {
     const collection = firestore.collection('parallelism-test');
 
     console.time('adding');
-    await Promise.all([collection.add({a: 1}), collection.add({b: 2}), collection.add({c: 3})]);
+    await Promise.all([
+      collection.add({ a: 1 }),
+      collection.add({ b: 2 }),
+      collection.add({ c: 3 }),
+    ]);
     console.timeEnd('adding');
 
     const snapshot = await collection.count().get();

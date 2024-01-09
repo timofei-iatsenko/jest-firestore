@@ -1,5 +1,5 @@
-import {type Firestore, getFirestore} from 'firebase-admin/firestore';
-import {initializeApp} from 'firebase-admin/app';
+import { type Firestore, getFirestore } from 'firebase-admin/firestore';
+import { initializeApp } from 'firebase-admin/app';
 
 describe('parallelism: first worker', () => {
   let firestore: Firestore;
@@ -14,7 +14,7 @@ describe('parallelism: first worker', () => {
 
     console.time('first worker: adding');
 
-    await collection.add({a: 1});
+    await collection.add({ a: 1 });
     console.timeEnd('first worker: adding');
 
     const count = await collection.count().get();

@@ -15,7 +15,7 @@ export interface FirestoreEmulatorArgs {
   single_project_mode_error?: boolean;
 }
 
-export type FirestoreEmulator = new (args: FirestoreEmulatorArgs) => FirestoreEmulatorInstance
+export type FirestoreEmulator = new (args: FirestoreEmulatorArgs) => FirestoreEmulatorInstance;
 
 export interface FirestoreEmulatorInstance {
   /**
@@ -65,5 +65,5 @@ export interface EmulatorInfo {
 export interface ListenSpec {
   address: string;
   port: number;
-  family: "IPv4" | "IPv6";
+  family: 'IPv4' | 'IPv6';
 }

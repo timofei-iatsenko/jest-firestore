@@ -1,6 +1,6 @@
 # jest-firestore
 
-[//]: # ([![CircleCI]&#40;https://circleci.com/gh/shelfio/jest-mongodb/tree/master.svg?style=svg&#41;]&#40;https://circleci.com/gh/shelfio/jest-mongodb/tree/master&#41; ![]&#40;https://img.shields.io/badge/code_style-prettier-ff69b4.svg&#41; [![npm &#40;scoped&#41;]&#40;https://img.shields.io/npm/v/@shelf/jest-mongodb.svg&#41;]&#40;https://www.npmjs.com/package/@shelf/jest-mongodb&#41;)
+[//]: # '[![CircleCI](https://circleci.com/gh/shelfio/jest-mongodb/tree/master.svg?style=svg)](https://circleci.com/gh/shelfio/jest-mongodb/tree/master) ![](https://img.shields.io/badge/code_style-prettier-ff69b4.svg) [![npm (scoped)](https://img.shields.io/npm/v/@shelf/jest-mongodb.svg)](https://www.npmjs.com/package/@shelf/jest-mongodb)'
 
 > Jest preset to run Firestore emulator automatically within your Jest Tests
 
@@ -46,12 +46,13 @@ Library provides `FIRESTORE_TESTING_DB` environment variable which is unique for
 you can use it when initializing `firebase-admin` in your tests.
 
 If you still want to have a separate emulator instance for each Jest worker, create the following configuration:
+
 ```js
 module.exports = {
   firestoreEmulatorOptions: {
-   // ...
+    // ...
   },
-  useSharedDBForAllJestWorkers: false
+  useSharedDBForAllJestWorkers: false,
 };
 ```
 
@@ -62,8 +63,8 @@ However, this is not recommended as it will slow down your tests.
 Library sets the `process.env.FIRESTORE_EMULATOR_HOST` for your convenience so `firebase-admin` and other firebase tools will pick it up automatically.
 
 ```ts
-import {type Firestore, getFirestore} from 'firebase-admin/firestore';
-import {initializeApp} from 'firebase-admin/app';
+import { type Firestore, getFirestore } from 'firebase-admin/firestore';
+import { initializeApp } from 'firebase-admin/app';
 
 describe('insert', () => {
   let firestore: Firestore;
@@ -83,8 +84,8 @@ describe('insert', () => {
 it('should insert a doc into collection', async () => {
   const users = firestore.collection('users');
 
-  const mockUser = {_id: 'some-user-id', name: 'John'};
-  const {id} = await users.add(mockUser);
+  const mockUser = { _id: 'some-user-id', name: 'John' };
+  const { id } = await users.add(mockUser);
 
   const insertedUser = await users.doc(id).get();
 
