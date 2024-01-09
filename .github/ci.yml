@@ -1,0 +1,34 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - '*'
+  push:
+    branches:
+      - main
+
+jobs:
+  validate:
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    name: validate (16, ubuntu-latest)
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          cache: yarn
+          node-version: 20
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Check Prettier Formatting
+        run: yarn prettier:check
+
+      - name: Testing
+        run: yarn test

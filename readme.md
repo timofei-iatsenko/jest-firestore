@@ -1,6 +1,6 @@
 # jest-firestore
 
-[//]: # '[![CircleCI](https://circleci.com/gh/shelfio/jest-mongodb/tree/master.svg?style=svg)](https://circleci.com/gh/shelfio/jest-mongodb/tree/master) ![](https://img.shields.io/badge/code_style-prettier-ff69b4.svg) [![npm (scoped)](https://img.shields.io/npm/v/@shelf/jest-mongodb.svg)](https://www.npmjs.com/package/@shelf/jest-mongodb)'
+[![main-suite](https://github.com/thekip/jest-firestore/actions/workflows/ci.yml/badge.svg)](https://github.com//thekip/jest-firestore/actions/workflows/ci.yml)
 
 > Jest preset to run Firestore emulator automatically within your Jest Tests
 
