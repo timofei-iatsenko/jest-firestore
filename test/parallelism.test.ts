@@ -12,10 +12,7 @@ describe('parallelism: first worker', () => {
   it('should have separate database', async () => {
     const collection = firestore.collection('parallelism-test');
 
-    console.time('first worker: adding');
-
     await collection.add({ a: 1 });
-    console.timeEnd('first worker: adding');
 
     const count = await collection.count().get();
 
