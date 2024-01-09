@@ -2,20 +2,16 @@ import { join as pathJoin } from 'node:path';
 import { readFileSync } from 'node:fs';
 
 import { TestEnvironment } from 'jest-environment-node';
-import type { EnvironmentContext } from '@jest/environment';
-import type { JestEnvironmentConfig } from '@jest/environment';
-import {
-  getFirestoreEmulatorOptions,
-  shouldUseSharedDBForAllJestWorkers,
-  getFreePort,
-} from './helpers';
-import { FirestoreEmulator, FirestoreEmulatorInstance } from './emulator';
+import type { EnvironmentContext, JestEnvironmentConfig } from '@jest/environment';
+import { getFirestoreEmulatorOptions, shouldUseSharedDBForAllJestWorkers } from './helpers';
+import { startEmulator, stopEmulator, EmulatorInfo } from './emulator';
 import { RuntimeConfig } from './types';
 
 const options = getFirestoreEmulatorOptions();
 
 const debug = require('debug')('jest-firestore:environment');
 
+let runningEmulator: EmulatorInfo;
 let i = 0;
 
 module.exports = class FirestoreEnvironment extends TestEnvironment {
@@ -33,18 +29,12 @@ module.exports = class FirestoreEnvironment extends TestEnvironment {
     if (globalConfig.emulatorHost) {
       this.global.process.env.FIRESTORE_EMULATOR_HOST = globalConfig.emulatorHost;
     } else {
-      const emulator: FirestoreEmulatorInstance = new FirestoreEmulator({
-        ...options,
-        port: await getFreePort(),
-      });
-
       // environment might be created in reused worker, so we need to check if emulator is already running
-      if (emulator.getInfo().pid === 0) {
-        await emulator.start();
+      if (!runningEmulator) {
+        runningEmulator = await startEmulator(options);
       }
 
-      const info = emulator.getInfo();
-      const emulatorHost = `${info.host}:${info.port}`;
+      const emulatorHost = `${runningEmulator.host}:${runningEmulator.port}`;
       this.global.process.env.FIRESTORE_EMULATOR_HOST = emulatorHost;
 
       debug(`Running Firestore Emulator on ${emulatorHost}`);
@@ -56,9 +46,6 @@ module.exports = class FirestoreEnvironment extends TestEnvironment {
 
     this.global.process.env.FIRESTORE_TESTING_DB = databaseName;
 
-    // this one is controversial, might override what user really wants, let's see
-    this.global.process.env.GCLOUD_PROJECT = options.project_id;
-
     debug(`Set testing database to ${databaseName}`);
 
     await super.setup();
@@ -68,8 +55,7 @@ module.exports = class FirestoreEnvironment extends TestEnvironment {
     debug('Teardown Firestore Test Environment');
 
     if (!shouldUseSharedDBForAllJestWorkers()) {
-      const emulator: FirestoreEmulatorInstance = new FirestoreEmulator({});
-      await emulator.stop();
+      await stopEmulator();
     }
 
     await super.teardown();

@@ -1,7 +1,7 @@
 import { join } from 'node:path';
 import { unlink } from 'node:fs';
 import type { JestEnvironmentConfig } from '@jest/environment';
-import { FirestoreEmulatorInstance, FirestoreEmulator } from './emulator';
+import { stopEmulator } from './emulator';
 import { shouldUseSharedDBForAllJestWorkers } from './helpers';
 
 const debug = require('debug')('jest-firestore:teardown');
@@ -11,9 +11,7 @@ module.exports = async function (config: JestEnvironmentConfig['globalConfig']) 
 
   if (shouldUseSharedDBForAllJestWorkers()) {
     debug('Teardown emulator');
-
-    const emulator: FirestoreEmulatorInstance = new FirestoreEmulator({});
-    await emulator.stop();
+    await stopEmulator();
   }
 
   unlink(globalConfigPath, (err) => {

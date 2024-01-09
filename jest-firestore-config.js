@@ -1,4 +1,4 @@
 module.exports = {
   firestoreEmulatorOptions: {},
-  useSharedDBForAllJestWorkers: false,
+  useSharedDBForAllJestWorkers: true,
 };
