@@ -1,0 +1,37 @@
+{
+  "git": {
+    "push": true,
+    "commit": true,
+    "commitMessage": "chore: version ${version} [skip ci]",
+    "requireBranch": "main",
+    "tag": true
+  },
+  "github": {
+    "release": true,
+    "autoGenerate": true,
+    "releaseName": "${version}"
+  },
+  "npm": {
+    "publish": true
+  },
+  "plugins": {
+    "@release-it/conventional-changelog": {
+      "preset": {
+        "name": "conventionalcommits",
+        "types": [
+          {
+            "type": "feat",
+            "section": "Features"
+          },
+          {
+            "type": "fix",
+            "section": "Bug Fixes"
+          },
+          {}
+        ]
+      },
+      "infile": "CHANGELOG.md",
+      "header": "# Change Log"
+    }
+  }
+}
