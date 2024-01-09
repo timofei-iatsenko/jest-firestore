@@ -4,9 +4,26 @@
 
 > Jest preset to run Firestore emulator automatically within your Jest Tests
 
-// todo: motivation and comparison to emulators:exec
+This package is created to help people who are using Firestore in their projects to write tests without mocking Firestore.
 
-//credits to jest-mongodb
+## Motivation
+
+The firebase itself provides [emulators suite](https://firebase.google.com/docs/emulator-suite) with a `emulators:exec` command which helps to use emulator suite in testing scenarios. However, using `emulators:exec` command brings some drawbacks.
+
+First, you are no longer able to run tests directly using Jest runner or from your IDE.
+You need to run it using `firebase emulators:exec "npx jest" --only firestore` command.
+
+The other way would be to always have emulators running in the background while development to be able to run tests from IDE or Jest CLI.
+This is not a big deal, but it's inconvenient and might not be transparent for other team members.
+
+The second and probably more important drawback is that `emulators:exec` doesn't work well in monorepo scenarios
+when you have multiple functions codebases.
+
+Firebase CLI allows you to run only one emulator per project and doesn't allow to set port dynamically.
+
+This package is created to solve these problems. It is heavily inspired by [jest-mongodb](https://github.com/shelfio/jest-mongodb) and allows you to run Firestore emulator automatically within your Jest tests.
+
+It uses native [`firebase-tools`](https://github.com/firebase/firebase-tools) under the hood, so it's exactly the same emulator as you would expect with Firebase CLI.
 
 ## Usage
 
@@ -104,7 +121,7 @@ See the [firebase docs](https://firebase.google.com/docs/emulator-suite/connect_
 ```js
 beforeEach(async () => {
   await fetch(
-    `http://${process.env.FIRESTORE_EMULATOR_HOST}/emulator/v1/projects/${project}/databases/${FIREBASE_TEST_DATABASE_ID}/documents`,
+    `http://${process.env.FIRESTORE_EMULATOR_HOST}/emulator/v1/projects/${project}/databases/${process.env.FIRESTORE_TESTING_DB}/documents`,
     { method: 'DELETE' },
   );
 });
