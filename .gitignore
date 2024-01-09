@@ -1,0 +1,10 @@
+.idea/
+coverage/
+node_modules/
+lib/
+temp
+yarn.lock
+*.log
+.DS_Store
+globalConfig.json
+!.husky/_/husky.sh
