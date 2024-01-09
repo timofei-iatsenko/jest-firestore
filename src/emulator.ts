@@ -21,7 +21,7 @@ export interface FirestoreEmulatorArgs {
 
 export async function startEmulator(args: FirestoreEmulatorArgs) {
   const emulator: FirestoreEmulatorInstance = new FirestoreEmulator({
-    args,
+    ...args,
     port: await getFreePort(),
   });
 

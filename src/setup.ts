@@ -21,9 +21,7 @@ module.exports = async (config: JestEnvironmentConfig['globalConfig']) => {
     const options = getFirestoreEmulatorOptions();
     debug(`Running Firestore Emulator on ${process.env.FIRESTORE_EMULATOR_HOST}`);
 
-    const info = await startEmulator({
-      ...options,
-    });
+    const info = await startEmulator(options);
 
     debug(`Emulator started for ${Date.now() - start}ms`);
 
