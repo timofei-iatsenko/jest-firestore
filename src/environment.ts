@@ -56,6 +56,9 @@ module.exports = class FirestoreEnvironment extends TestEnvironment {
 
     this.global.process.env.FIRESTORE_TESTING_DB = databaseName;
 
+    // this one is controversial, might override what user really wants, let's see
+    this.global.process.env.GCLOUD_PROJECT = options.project_id;
+
     debug(`Set testing database to ${databaseName}`);
 
     await super.setup();
