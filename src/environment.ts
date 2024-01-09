@@ -1,21 +1,19 @@
-import {join as pathJoin} from 'node:path';
-import {readFileSync} from 'node:fs';
+import { join as pathJoin } from 'node:path';
+import { readFileSync } from 'node:fs';
 
-import {TestEnvironment} from 'jest-environment-node';
-import type {EnvironmentContext} from '@jest/environment';
-import type {JestEnvironmentConfig} from '@jest/environment';
+import { TestEnvironment } from 'jest-environment-node';
+import type { EnvironmentContext } from '@jest/environment';
+import type { JestEnvironmentConfig } from '@jest/environment';
 import {
   getFirestoreEmulatorOptions,
   shouldUseSharedDBForAllJestWorkers,
   getFreePort,
 } from './helpers';
-import {FirestoreEmulator, FirestoreEmulatorInstance} from './emulator';
-import {RuntimeConfig} from './types';
+import { FirestoreEmulator, FirestoreEmulatorInstance } from './emulator';
+import { RuntimeConfig } from './types';
 
 const options = getFirestoreEmulatorOptions();
-const emulator: FirestoreEmulatorInstance = new FirestoreEmulator(options);
 
-// eslint-disable-next-line import/order
 const debug = require('debug')('jest-firestore:environment');
 
 let i = 0;
@@ -28,7 +26,7 @@ module.exports = class FirestoreEnvironment extends TestEnvironment {
   }
 
   async setup() {
-    debug('Setup Firestore Test Environment');
+    debug(`Setup Firestore Test Environment. PID: ${process.pid}`);
 
     const globalConfig = JSON.parse(readFileSync(this.globalConfigPath, 'utf-8')) as RuntimeConfig;
 
@@ -36,10 +34,15 @@ module.exports = class FirestoreEnvironment extends TestEnvironment {
       this.global.process.env.FIRESTORE_EMULATOR_HOST = globalConfig.emulatorHost;
     } else {
       const emulator: FirestoreEmulatorInstance = new FirestoreEmulator({
+        ...options,
         port: await getFreePort(),
       });
 
-      await emulator.start();
+      // environment might be created in reused worker, so we need to check if emulator is already running
+      if (emulator.getInfo().pid === 0) {
+        await emulator.start();
+      }
+
       const info = emulator.getInfo();
       const emulatorHost = `${info.host}:${info.port}`;
       this.global.process.env.FIRESTORE_EMULATOR_HOST = emulatorHost;
@@ -50,6 +53,7 @@ module.exports = class FirestoreEnvironment extends TestEnvironment {
     const databaseName = shouldUseSharedDBForAllJestWorkers()
       ? `db-${process.pid}-${i++}`
       : '(default)';
+
     this.global.process.env.FIRESTORE_TESTING_DB = databaseName;
 
     debug(`Set testing database to ${databaseName}`);
@@ -60,7 +64,10 @@ module.exports = class FirestoreEnvironment extends TestEnvironment {
   async teardown() {
     debug('Teardown Firestore Test Environment');
 
-    await emulator.stop();
+    if (!shouldUseSharedDBForAllJestWorkers()) {
+      const emulator: FirestoreEmulatorInstance = new FirestoreEmulator({});
+      await emulator.stop();
+    }
 
     await super.teardown();
   }

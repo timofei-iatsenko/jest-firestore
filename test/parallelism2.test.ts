@@ -5,14 +5,8 @@ describe('parallelism: second worker', () => {
   let firestore: Firestore;
 
   beforeAll(() => {
-    console.log(process.pid, process.env.JEST_WORKER_ID);
-
     const app = initializeApp();
     firestore = getFirestore(app, process.env.FIRESTORE_TESTING_DB!);
-  });
-
-  afterAll(async () => {
-    await firestore.terminate();
   });
 
   it('should have separate database', async () => {

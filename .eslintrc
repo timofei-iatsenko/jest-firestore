@@ -1,9 +1,16 @@
 {
-  "root": true,
   "extends": [
-    "@shelf/eslint-config/typescript"
+    "eslint:recommended", "plugin:@typescript-eslint/recommended"
   ],
+  "parser": "@typescript-eslint/parser",
+  "plugins": [
+    "@typescript-eslint"
+  ],
+  "env": {
+    "node": true
+  },
   "rules": {
     "@typescript-eslint/no-var-requires": "off"
-  }
+  },
+  "root": true
 }

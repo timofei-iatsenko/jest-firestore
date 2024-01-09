@@ -5,13 +5,8 @@ describe('insert', () => {
   let firestore: Firestore;
 
   beforeAll(() => {
-    console.log(process.pid, process.env.JEST_WORKER_ID);
     const app = initializeApp();
     firestore = getFirestore(app);
-  });
-
-  afterAll(async () => {
-    await firestore.terminate();
   });
 
   it('should insert a doc into collection', async () => {

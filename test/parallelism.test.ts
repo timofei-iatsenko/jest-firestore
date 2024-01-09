@@ -5,20 +5,18 @@ describe('parallelism: first worker', () => {
   let firestore: Firestore;
 
   beforeAll(() => {
-    console.log(process.pid, process.env.JEST_WORKER_ID);
-
     const app = initializeApp();
     firestore = getFirestore(app, process.env.FIRESTORE_TESTING_DB!);
-  });
-
-  afterAll(async () => {
-    await firestore.terminate();
   });
 
   it('should have separate database', async () => {
     const collection = firestore.collection('parallelism-test');
 
+    console.time('first worker: adding');
+
     await collection.add({a: 1});
+    console.timeEnd('first worker: adding');
+
     const count = await collection.count().get();
 
     expect(count.data().count).toBe(1);

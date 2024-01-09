@@ -1,28 +1,28 @@
-import {resolve} from 'path';
-import type {FirestoreEmulatorArgs} from './emulator';
-import {AddressInfo, createServer} from 'net';
+import { resolve } from 'path';
+import type { FirestoreEmulatorArgs } from './emulator';
+import { AddressInfo, createServer } from 'net';
 
 const cwd = process.cwd();
-const configFile = process.env.MONGO_MEMORY_SERVER_FILE || 'jest-firestore-config.js';
+const configFile = process.env.JEST_FIREBASE_CONFIG_FILE || 'jest-firestore-config.js';
+
+const defaultEmulatorOptions: FirestoreEmulatorArgs = {
+  auto_download: true,
+  project_id: 'demo-e2e-test',
+};
 
 export function getFirestoreEmulatorOptions(): FirestoreEmulatorArgs {
   try {
-    const {mongodbMemoryServerOptions: options} = require(resolve(cwd, configFile));
+    const { firestoreEmulatorOptions: options } = require(resolve(cwd, configFile));
 
-    return options;
+    return { ...defaultEmulatorOptions, ...options };
   } catch (e) {
-    return {
-      port: 8080,
-      host: '127.0.0.1',
-      websocket_port: 8081,
-      project_id: 'demo-e2e-test',
-    };
+    return defaultEmulatorOptions;
   }
 }
 
 export function shouldUseSharedDBForAllJestWorkers() {
   try {
-    const {useSharedDBForAllJestWorkers} = require(resolve(cwd, configFile));
+    const { useSharedDBForAllJestWorkers } = require(resolve(cwd, configFile));
 
     if (typeof useSharedDBForAllJestWorkers === 'undefined') {
       return true;
@@ -35,11 +35,11 @@ export function shouldUseSharedDBForAllJestWorkers() {
 }
 
 export function getFreePort(): Promise<number> {
-  return new Promise(res => {
+  return new Promise((res) => {
     const srv = createServer();
     srv.listen(0, () => {
       const port = (srv.address() as AddressInfo).port;
-      srv.close(_ => res(port));
+      srv.close(() => res(port));
     });
   });
 }

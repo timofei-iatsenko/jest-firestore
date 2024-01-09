@@ -1,4 +1,4 @@
 module.exports = {
-  mongodbMemoryServerOptions: {},
-  useSharedDBForAllJestWorkers: true,
+  firestoreEmulatorOptions: {},
+  useSharedDBForAllJestWorkers: false,
 };

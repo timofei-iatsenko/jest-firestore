@@ -1,6 +1,11 @@
 {
-  "extends": "@shelf/tsconfig/backend",
   "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "module": "commonjs",
+    "sourceMap": false,
+    "target": "esnext",
     "strict": true
   },
   "exclude": ["node_modules"],

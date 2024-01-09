@@ -1,179 +1,113 @@
-# jest-mongodb [![CircleCI](https://circleci.com/gh/shelfio/jest-mongodb/tree/master.svg?style=svg)](https://circleci.com/gh/shelfio/jest-mongodb/tree/master) ![](https://img.shields.io/badge/code_style-prettier-ff69b4.svg) [![npm (scoped)](https://img.shields.io/npm/v/@shelf/jest-mongodb.svg)](https://www.npmjs.com/package/@shelf/jest-mongodb)
+# jest-firestore
 
-> Jest preset to run MongoDB memory server
+[//]: # ([![CircleCI]&#40;https://circleci.com/gh/shelfio/jest-mongodb/tree/master.svg?style=svg&#41;]&#40;https://circleci.com/gh/shelfio/jest-mongodb/tree/master&#41; ![]&#40;https://img.shields.io/badge/code_style-prettier-ff69b4.svg&#41; [![npm &#40;scoped&#41;]&#40;https://img.shields.io/npm/v/@shelf/jest-mongodb.svg&#41;]&#40;https://www.npmjs.com/package/@shelf/jest-mongodb&#41;)
+
+> Jest preset to run Firestore emulator automatically within your Jest Tests
+
+// todo: motivation and comparison to emulators:exec
+
+//credits to jest-mongodb
 
 ## Usage
 
 ### 0. Install
 
-```
-$ yarn add @shelf/jest-mongodb --dev
+```bash
+yarn add jest-firestore --dev
 ```
 
-Make sure `mongodb` is installed in the project as well, as it's required as a peer dependency.
+Make sure `firebase-tools` is installed in the project as well, as it's required as a peer dependency.
 
 ### 1. Create `jest.config.js`
 
 ```js
 module.exports = {
-  preset: '@shelf/jest-mongodb',
+  preset: 'jest-firestore',
 };
 ```
 
 If you have a custom `jest.config.js` make sure you remove `testEnvironment` property, otherwise it will conflict with the preset.
 
-### 2. Create `jest-mongodb-config.js`
-
-See [mongodb-memory-server](https://github.com/nodkz/mongodb-memory-server#available-options)
+### 2. Create `jest-firebase-config.js`
 
 ```js
 module.exports = {
-  mongodbMemoryServerOptions: {
-    binary: {
-      version: '4.0.3',
-      skipMD5: true,
-    },
-    autoStart: false,
-    instance: {},
+  firestoreEmulatorOptions: {
+    project_id: 'demo-test-project',
+    // todo: didn't tested yet, need to figure out is it relative or absolute path
+    rules: 'firestore.rules', // optional path to rules file
   },
 };
 ```
 
-To use the same database for all tests pass the config like this:
+By default, one emulator instance would be created for all Jest workers. You can achieve parallelism by leveraging emulator's [multi database support](https://firebase.google.com/docs/emulator-suite/connect_firestore#multiple_db_ui).
 
+Library provides `FIRESTORE_TESTING_DB` environment variable which is unique for each Jest worker,
+you can use it when initializing `firebase-admin` in your tests.
+
+If you still want to have a separate emulator instance for each Jest worker, create the following configuration:
 ```js
 module.exports = {
-  mongodbMemoryServerOptions: {
-    binary: {
-      version: '4.0.3',
-      skipMD5: true,
-    },
-    instance: {
-      dbName: 'jest',
-    },
-    autoStart: false,
+  firestoreEmulatorOptions: {
+   // ...
   },
+  useSharedDBForAllJestWorkers: false
 };
 ```
 
-To use separate database for each jest worker pass the `useSharedDBForAllJestWorkers: false` (doesn't create `process.env` variable when using this option):
+However, this is not recommended as it will slow down your tests.
 
-```js
-module.exports = {
-  mongodbMemoryServerOptions: {
-    binary: {
-      skipMD5: true,
-    },
-    autoStart: false,
-    instance: {},
-  },
+### 3. Configure `firebase-admin`
 
-  useSharedDBForAllJestWorkers: false,
-};
-```
+Library sets the `process.env.FIRESTORE_EMULATOR_HOST` for your convenience so `firebase-admin` and other firebase tools will pick it up automatically.
 
-To use dynamic database name you must pass empty object for instance field:
-
-```js
-module.exports = {
-  mongodbMemoryServerOptions: {
-    binary: {
-      version: '4.0.3',
-      skipMD5: true,
-    },
-    instance: {},
-    autoStart: false,
-  },
-};
-```
-
-To use another uri environment variable name you must set mongoURLEnvName field:
-
-```js
-module.exports = {
-  mongodbMemoryServerOptions: {
-    binary: {
-      version: '4.0.3',
-      skipMD5: true,
-    },
-    instance: {},
-    autoStart: false,
-  },
-  mongoURLEnvName: 'MONGODB_URI',
-};
-```
-
-To use mongo as a replica set you must add the `replSet` config object and set
-`count` and `storageEngine` fields:
-
-```js
-module.exports = {
-  mongodbMemoryServerOptions: {
-    binary: {
-      skipMD5: true,
-    },
-    autoStart: false,
-    instance: {},
-    replSet: {
-      count: 3,
-      storageEngine: 'wiredTiger',
-    },
-  },
-};
-```
-
-### 3. Configure MongoDB client
-
-Library sets the `process.env.MONGO_URL` for your convenience, but using of `global.__MONGO_URI__` is preferable as it works with ` useSharedDBForAllJestWorkers: false`
-
-```js
-const {MongoClient} = require('mongodb');
+```ts
+import {type Firestore, getFirestore} from 'firebase-admin/firestore';
+import {initializeApp} from 'firebase-admin/app';
 
 describe('insert', () => {
-  let connection;
-  let db;
+  let firestore: Firestore;
 
-  beforeAll(async () => {
-    connection = await MongoClient.connect(global.__MONGO_URI__, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-    db = await connection.db();
-  });
-
-  afterAll(async () => {
-    await connection.close();
+  beforeAll(() => {
+    const app = initializeApp();
+    // `firebase-admin` automatically discover FIRESTORE_EMULATOR_HOST env and connect to emulator.
+    // Pass process.env.FIRESTORE_TESTING_DB to enable parallelism. Each jest worker would use separate database
+    firestore = getFirestore(app, process.env.FIRESTORE_TESTING_DB);
   });
 });
 ```
 
 ### 4. PROFIT! Write tests
 
-```js
+```ts
 it('should insert a doc into collection', async () => {
-  const users = db.collection('users');
+  const users = firestore.collection('users');
 
   const mockUser = {_id: 'some-user-id', name: 'John'};
-  await users.insertOne(mockUser);
+  const {id} = await users.add(mockUser);
 
-  const insertedUser = await users.findOne({_id: 'some-user-id'});
-  expect(insertedUser).toEqual(mockUser);
+  const insertedUser = await users.doc(id).get();
+
+  expect(insertedUser.data()).toEqual(mockUser);
 });
 ```
 
-Cache MongoDB binary in CI by putting this folder to the list of cached paths: `./node_modules/.cache/mongodb-memory-server/mongodb-binaries`
+Cache Firebase Emulators binary in CI by putting this folder to the list of cached paths: `~/.cache/firebase/emulators.`
 
-You can enable debug logs by setting environment variable `DEBUG=jest-mongodb:*`
+You can enable debug logs by setting environment variable `DEBUG=jest-firestore:*`
 
-#### 5. Clean collections before each test (optional)
+#### 5. Clean database before each test (optional)
+
+See the [firebase docs](https://firebase.google.com/docs/emulator-suite/connect_firestore#clear_your_database_between_tests)
 
 ```js
 beforeEach(async () => {
-  await db.collection('COLLECTION_NAME').deleteMany({});
+  await fetch(
+    `http://${process.env.FIRESTORE_EMULATOR_HOST}/emulator/v1/projects/${project}/databases/${FIREBASE_TEST_DATABASE_ID}/documents`,
+    { method: 'DELETE' },
+  );
 });
 ```
-
-<sub>See [this issue](https://github.com/shelfio/jest-mongodb/issues/173) for discussion</sub>
 
 #### 6. Jest watch mode gotcha
 
@@ -191,16 +125,13 @@ module.exports = {
 ## See Also
 
 - [jest-dynamodb](https://github.com/shelfio/jest-dynamodb)
+- [jest-mongodb](https://github.com/shelfio/jest-mongodb)
 
 ## Publish
 
-```sh
-$ git checkout master
-$ yarn version
-$ yarn publish
-$ git push origin master --tags
+```bash
+git checkout main
+yarn version
+yarn publish
+git push origin main --tags
 ```
-
-## License
-
-MIT © [Shelf](https://shelf.io)
