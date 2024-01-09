@@ -28,7 +28,8 @@
     "prepack": "yarn build",
     "test": "jest",
     "type-check": "tsc --noEmit",
-    "type-check:watch": "npm run type-check -- --watch"
+    "type-check:watch": "npm run type-check -- --watch",
+    "postinstall": "yarn build"
   },
   "lint-staged": {
     "**/*": "prettier --write --ignore-unknown",
