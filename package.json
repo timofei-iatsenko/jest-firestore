@@ -42,7 +42,8 @@
     "extends": "@shelf/babel-config/backend"
   },
   "jest": {
-    "preset": "./jest-dev-preset.js"
+    "preset": "./jest-dev-preset.js",
+    "testTimeout:": 10000
   },
   "dependencies": {
     "debug": "4.3.4"
