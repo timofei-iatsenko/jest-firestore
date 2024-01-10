@@ -1,5 +1,7 @@
 # Change Log
 
+* fix: use rootDir instead of CWD for consistent execution (c9b05bf)
+
 * fix: small fixes in debug printing (d71dd10)
 * readme: update readme [skip ci] (7182c19)
 
