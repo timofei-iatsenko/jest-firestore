@@ -25,8 +25,8 @@ export async function startEmulator(args: FirestoreEmulatorArgs) {
     port: await getFreePort(),
   });
 
-  const info = emulator.getInfo();
   await emulator.start();
+  const info = emulator.getInfo();
   debug('Emulator info', { info });
   await waitForPortUsed(info.port, connectableHostname(info.host));
   debug(`Port ${info.port} used`);

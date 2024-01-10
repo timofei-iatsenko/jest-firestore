@@ -19,7 +19,7 @@ module.exports = async (config: JestEnvironmentConfig['globalConfig']) => {
   if (shouldUseSharedDBForAllJestWorkers()) {
     const start = Date.now();
     const options = getFirestoreEmulatorOptions();
-    debug(`Running Firestore Emulator on ${process.env.FIRESTORE_EMULATOR_HOST}`);
+    debug(`Running Firestore Emulator`);
 
     const info = await startEmulator(options);
 
