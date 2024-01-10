@@ -7,6 +7,11 @@ const configFile = process.env.JEST_FIRESTORE_CONFIG_FILE || 'jest-firestore-con
 const defaultEmulatorOptions: FirestoreEmulatorArgs = {
   auto_download: true,
   project_id: 'demo-e2e-test',
+  /**
+   * By default `localhost` is used. But NodeJS sometimes resolves it
+   * to IPv6 address where firestore emulator not listen for it.
+   */
+  host: '127.0.0.1',
 };
 
 export function getFirestoreEmulatorOptions(rootDir: string): FirestoreEmulatorArgs {
