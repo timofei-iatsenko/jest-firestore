@@ -1,5 +1,8 @@
 # Change Log
 
+* fix: small fixes in debug printing (d71dd10)
+* readme: update readme [skip ci] (7182c19)
+
 ## [0.1.1](https://github.com/thekip/jest-firestore/compare/0.1.0...0.1.1) (2024-01-09)
 
 
