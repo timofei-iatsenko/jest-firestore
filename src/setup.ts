@@ -30,11 +30,6 @@ module.exports = async (config: JestEnvironmentConfig['globalConfig']) => {
     runtimeConfig.emulatorHost = `${info.host}:${info.port}`;
     process.env['FIRESTORE_EMULATOR_HOST'] = runtimeConfig.emulatorHost;
 
-    // it seems there some initialization logic in the emulator.
-    // without this delay very first access to the emulator has 5+ secods delay
-    // so this delay here is smaller than delay without it
-    // await new Promise((res) => setTimeout(res, 1400));
-
     // this one is controversial, might override what user really wants, let's see
     process.env.GCLOUD_PROJECT = options.project_id;
   }
