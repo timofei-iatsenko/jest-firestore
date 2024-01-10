@@ -7,18 +7,21 @@ import { getFirestoreEmulatorOptions, shouldUseSharedDBForAllJestWorkers } from 
 import { startEmulator, stopEmulator, EmulatorInfo } from './emulator';
 import { RuntimeConfig } from './types';
 
-const options = getFirestoreEmulatorOptions();
-
 const debug = require('debug')('jest-firestore:environment');
 
 let runningEmulator: EmulatorInfo;
 let i = 0;
 
 module.exports = class FirestoreEnvironment extends TestEnvironment {
-  globalConfigPath: string;
-  constructor(config: JestEnvironmentConfig, context: EnvironmentContext) {
+  private globalConfigPath: string;
+  private shouldUseSharedDBForAllJestWorkers: boolean;
+
+  constructor(private config: JestEnvironmentConfig, context: EnvironmentContext) {
     super(config, context);
     this.globalConfigPath = pathJoin(config.globalConfig.rootDir, 'globalConfig.json');
+    this.shouldUseSharedDBForAllJestWorkers = shouldUseSharedDBForAllJestWorkers(
+      config.globalConfig.rootDir,
+    );
   }
 
   async setup() {
@@ -31,6 +34,7 @@ module.exports = class FirestoreEnvironment extends TestEnvironment {
     } else {
       // environment might be created in reused worker, so we need to check if emulator is already running
       if (!runningEmulator) {
+        const options = getFirestoreEmulatorOptions(this.config.globalConfig.rootDir);
         runningEmulator = await startEmulator(options);
       }
 
@@ -40,7 +44,7 @@ module.exports = class FirestoreEnvironment extends TestEnvironment {
       debug(`Running Firestore Emulator on ${emulatorHost}`);
     }
 
-    const databaseName = shouldUseSharedDBForAllJestWorkers()
+    const databaseName = this.shouldUseSharedDBForAllJestWorkers
       ? `db-${process.pid}-${i++}`
       : '(default)';
 
@@ -54,7 +58,7 @@ module.exports = class FirestoreEnvironment extends TestEnvironment {
   async teardown() {
     debug('Teardown Firestore Test Environment');
 
-    if (!shouldUseSharedDBForAllJestWorkers()) {
+    if (!this.shouldUseSharedDBForAllJestWorkers) {
       await stopEmulator();
     }
 

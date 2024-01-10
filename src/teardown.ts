@@ -9,7 +9,7 @@ const debug = require('debug')('jest-firestore:teardown');
 module.exports = async function (config: JestEnvironmentConfig['globalConfig']) {
   const globalConfigPath = join(config.rootDir, 'globalConfig.json');
 
-  if (shouldUseSharedDBForAllJestWorkers()) {
+  if (shouldUseSharedDBForAllJestWorkers(config.rootDir)) {
     debug('Teardown emulator');
     await stopEmulator();
   }

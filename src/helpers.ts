@@ -2,17 +2,16 @@ import { resolve } from 'path';
 import type { FirestoreEmulatorArgs } from './emulator';
 import { AddressInfo, createServer } from 'net';
 
-const cwd = process.cwd();
-const configFile = process.env.JEST_FIREBASE_CONFIG_FILE || 'jest-firestore-config.js';
+const configFile = process.env.JEST_FIRESTORE_CONFIG_FILE || 'jest-firestore-config.js';
 
 const defaultEmulatorOptions: FirestoreEmulatorArgs = {
   auto_download: true,
   project_id: 'demo-e2e-test',
 };
 
-export function getFirestoreEmulatorOptions(): FirestoreEmulatorArgs {
+export function getFirestoreEmulatorOptions(rootDir: string): FirestoreEmulatorArgs {
   try {
-    const { firestoreEmulatorOptions: options } = require(resolve(cwd, configFile));
+    const { firestoreEmulatorOptions: options } = require(resolve(rootDir, configFile));
 
     return { ...defaultEmulatorOptions, ...options };
   } catch (e) {
@@ -20,9 +19,9 @@ export function getFirestoreEmulatorOptions(): FirestoreEmulatorArgs {
   }
 }
 
-export function shouldUseSharedDBForAllJestWorkers() {
+export function shouldUseSharedDBForAllJestWorkers(rootDir: string) {
   try {
-    const { useSharedDBForAllJestWorkers } = require(resolve(cwd, configFile));
+    const { useSharedDBForAllJestWorkers } = require(resolve(rootDir, configFile));
 
     if (typeof useSharedDBForAllJestWorkers === 'undefined') {
       return true;

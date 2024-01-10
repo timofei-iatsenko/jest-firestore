@@ -13,12 +13,14 @@ module.exports = async (config: JestEnvironmentConfig['globalConfig']) => {
 
   const runtimeConfig: RuntimeConfig = {};
 
-  debug(`shouldUseSharedDBForAllJestWorkers: ${shouldUseSharedDBForAllJestWorkers()}`);
+  debug(
+    `shouldUseSharedDBForAllJestWorkers: ${shouldUseSharedDBForAllJestWorkers(config.rootDir)}`,
+  );
 
   // if we run one emulator instance for all tests
-  if (shouldUseSharedDBForAllJestWorkers()) {
+  if (shouldUseSharedDBForAllJestWorkers(config.rootDir)) {
     const start = Date.now();
-    const options = getFirestoreEmulatorOptions();
+    const options = getFirestoreEmulatorOptions(config.rootDir);
     debug(`Running Firestore Emulator`);
 
     const info = await startEmulator(options);
