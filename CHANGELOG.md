@@ -1,5 +1,8 @@
 # Change Log
 
+* fix: set 127.0.0.1 as default host and update comments (9ec3ce2)
+* chore: cleanup (b400bfd)
+
 * fix: use rootDir instead of CWD for consistent execution (c9b05bf)
 
 * fix: small fixes in debug printing (d71dd10)
