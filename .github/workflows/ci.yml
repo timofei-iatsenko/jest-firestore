@@ -34,5 +34,3 @@ jobs:
         run: |
           yarn test
           yarn test:separate-instances
-
-
