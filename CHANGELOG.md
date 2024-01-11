@@ -1,5 +1,13 @@
 # Change Log
 
+* chore: debug tests on ci (59d0100)
+* chore: debug tests on ci (8c3d2d3)
+* chore: tests (8a5c4ae)
+* chore: prettier (fe8a077)
+* chore: setup husky properly (81458eb)
+* feat: allow bypassing starting emulator. (2a9e50d)
+* chore: update readme (f120393)
+
 * fix: set 127.0.0.1 as default host and update comments (9ec3ce2)
 * chore: cleanup (b400bfd)
 

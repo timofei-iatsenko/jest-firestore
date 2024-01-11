@@ -1,6 +1,6 @@
 {
   "name": "jest-firestore",
-  "version": "0.1.4",
+  "version": "0.2.0",
   "description": "Run your tests using Jest & Firestore Emulator",
   "keywords": [
     "jest",
