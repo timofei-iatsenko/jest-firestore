@@ -60,7 +60,7 @@ describe('insert', () => {
 
   beforeAll(() => {
     // setup deffiernet database for each jest worker
-    const databaseName = "test-" + process.pid;
+    const databaseName = 'test-' + process.pid;
 
     // `firebase-admin` automatically discover FIRESTORE_EMULATOR_HOST.
     const app = initializeApp();
@@ -109,6 +109,7 @@ module.exports = {
   useSharedDBForAllJestWorkers: false,
 };
 ```
+
 However, this is not recommended as it will slow down your tests.
 
 ### 5. Clean database before each test (optional)
@@ -155,7 +156,7 @@ You can enable debug logs by setting environment variable `DEBUG=jest-firestore:
 Run `release` workflow from GitHub Actions.
 
 Or run manually:
+
 ```bash
 npx release-it
 ```
-

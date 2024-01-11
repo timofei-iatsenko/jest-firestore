@@ -6,7 +6,6 @@ temp
 *.log
 .DS_Store
 globalConfig.json
-!.husky/_/husky.sh
 
 .yarn
 !.yarn/releases
