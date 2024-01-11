@@ -31,7 +31,7 @@ jobs:
         run: yarn prettier:check
 
       - name: Testing with Shared DB
-        run: yarn test:separate-instances
+        run: yarn test
 
       - name: Testing with separate instances
         run: yarn test:separate-instances

@@ -28,7 +28,7 @@
     "prettier:check": "prettier --check --ignore-unknown '**/*'",
     "prepack": "yarn build",
     "test": "jest test/",
-    "test:separate-instances": "JEST_FIRESTORE_CONFIG_FILE=\"jest-firestore-config-separate-instances.js\" jest test-separate-instances/",
+    "test:separate-instances": "DEBUG='jest-firestore:*' JEST_FIRESTORE_CONFIG_FILE=\"jest-firestore-config-separate-instances.js\" jest test-separate-instances/",
     "type-check": "tsc --noEmit",
     "type-check:watch": "npm run type-check -- --watch",
     "prepare": "husky install"
