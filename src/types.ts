@@ -1,10 +1,7 @@
-/* eslint-disable */
-
-declare global {}
-
-export type RuntimeConfig = {
-  emulatorHost?: string;
-};
+declare global {
+  // eslint-disable-next-line no-var
+  var __isEmulatorStarted: boolean;
+}
 
 export type Options = {
   /**

@@ -1,40 +1,30 @@
-/* eslint-disable multiline-ternary */
-import { writeFileSync } from 'fs';
-import { join } from 'path';
 import type { JestEnvironmentConfig } from '@jest/environment';
 import { getFirestoreEmulatorOptions, shouldUseSharedDBForAllJestWorkers } from './helpers';
 import { startEmulator } from './emulator';
-import { RuntimeConfig } from './types';
-
 const debug = require('debug')('jest-firestore:setup');
 
 module.exports = async (config: JestEnvironmentConfig['globalConfig']) => {
-  const globalConfigPath = join(config.rootDir, 'globalConfig.json');
+  const _shouldUseSharedDBForAllJestWorkers = shouldUseSharedDBForAllJestWorkers(config.rootDir);
 
-  const runtimeConfig: RuntimeConfig = {};
+  debug(`shouldUseSharedDBForAllJestWorkers: ${_shouldUseSharedDBForAllJestWorkers}`);
 
-  debug(
-    `shouldUseSharedDBForAllJestWorkers: ${shouldUseSharedDBForAllJestWorkers(config.rootDir)}`,
-  );
+  // if we have FIRESTORE_EMULATOR_HOST already passed from env, bypass starting emulator
+  if (process.env.FIRESTORE_EMULATOR_HOST) {
+    debug(
+      `FIRESTORE_EMULATOR_HOST is set to ${process.env.FIRESTORE_EMULATOR_HOST}, bypassing emulator start`,
+    );
+    return;
+  }
 
   // if we run one emulator instance for all tests
-  if (shouldUseSharedDBForAllJestWorkers(config.rootDir)) {
-    const start = Date.now();
+  if (_shouldUseSharedDBForAllJestWorkers) {
     const options = getFirestoreEmulatorOptions(config.rootDir);
-    debug(`Running Firestore Emulator`);
-
-    const info = await startEmulator(options);
-
-    debug(`Emulator started for ${Date.now() - start}ms`);
-
-    runtimeConfig.emulatorHost = `${info.host}:${info.port}`;
-    process.env['FIRESTORE_EMULATOR_HOST'] = runtimeConfig.emulatorHost;
+    debug(`Starting Firestore Emulator`);
+    process.env['FIRESTORE_EMULATOR_HOST'] = await startEmulator(options);
 
     // this one is controversial, might override what user really wants, let's see
     process.env.GCLOUD_PROJECT = options.project_id;
-  }
 
-  // Write global config to disk because all tests run in different contexts.
-  writeFileSync(globalConfigPath, JSON.stringify(runtimeConfig));
-  debug('Config is written');
+    global.__isEmulatorStarted = true;
+  }
 };

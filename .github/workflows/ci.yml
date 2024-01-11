@@ -31,4 +31,8 @@ jobs:
         run: yarn prettier:check
 
       - name: Testing
-        run: yarn test --runInBand
+        run: |
+          yarn test
+          yarn test:separate-instances
+
+

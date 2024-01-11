@@ -20,6 +20,8 @@ export interface FirestoreEmulatorArgs {
 }
 
 export async function startEmulator(args: FirestoreEmulatorArgs) {
+  const start = Date.now();
+
   const emulator: FirestoreEmulatorInstance = new FirestoreEmulator({
     ...args,
     port: await getFreePort(),
@@ -29,9 +31,9 @@ export async function startEmulator(args: FirestoreEmulatorArgs) {
   const info = emulator.getInfo();
   debug('Emulator info', { info });
   await waitForPortUsed(info.port, connectableHostname(info.host));
-  debug(`Port ${info.port} used`);
+  debug(`Emulator ready on ${info.port} port; took ${Date.now() - start}ms`);
 
-  return info;
+  return `${info.host}:${info.port}`;
 }
 
 export async function stopEmulator() {

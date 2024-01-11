@@ -47,9 +47,6 @@ If you have a custom `jest.config.js` make sure you remove `testEnvironment` pro
 
 By default, one emulator instance would be created for all Jest workers. You can achieve parallelism by leveraging emulator's [multi database support](https://firebase.google.com/docs/emulator-suite/connect_firestore#multiple_db_ui).
 
-Library provides `FIRESTORE_TESTING_DB` environment variable which is unique for each Jest worker,
-you can use it when initializing `firebase-admin` in your tests.
-
 ### 2. Configure `firebase-admin`
 
 Library sets the `process.env.FIRESTORE_EMULATOR_HOST` for your convenience so `firebase-admin` and other firebase tools will pick it up automatically.
@@ -62,12 +59,12 @@ describe('insert', () => {
   let firestore: Firestore;
 
   beforeAll(() => {
-    const app = initializeApp();
-    // `firebase-admin` automatically discover FIRESTORE_EMULATOR_HOST.
+    // setup deffiernet database for each jest worker
+    const databaseName = "test-" + process.pid;
 
-    // Pass process.env.FIRESTORE_TESTING_DB to enable parallelism.
-    // Each jest worker would use separate database
-    firestore = getFirestore(app, process.env.FIRESTORE_TESTING_DB);
+    // `firebase-admin` automatically discover FIRESTORE_EMULATOR_HOST.
+    const app = initializeApp();
+    firestore = getFirestore(app, databaseName);
   });
 });
 ```
@@ -114,30 +111,32 @@ module.exports = {
 ```
 However, this is not recommended as it will slow down your tests.
 
-#### 5. Clean database before each test (optional)
+### 5. Clean database before each test (optional)
 
 See the [firebase docs](https://firebase.google.com/docs/emulator-suite/connect_firestore#clear_your_database_between_tests)
 
 ```js
 beforeEach(async () => {
   await fetch(
-    `http://${process.env.FIRESTORE_EMULATOR_HOST}/emulator/v1/projects/${process.env.GCLOUD_PROJECT}/databases/${process.env.FIRESTORE_TESTING_DB}/documents`,
+    `http://${process.env.FIRESTORE_EMULATOR_HOST}/emulator/v1/projects/${process.env.GCLOUD_PROJECT}/databases/${databaseName}/documents`,
     { method: 'DELETE' },
   );
 });
 ```
 
-#### Jest watch mode gotcha
+## Bypassing starting emulator
 
-This package creates the file `globalConfig.json` in the project root, when using jest `--watch` flag, changes to `globalConfig.json` can cause an infinite loop
+You may want to bypass starting emulator during tests and connect to the external running emulator instead.
+Pass `FIRESTORE_EMULATOR_HOST` environment variable to your tests to achieve this.
 
-In order to avoid this unwanted behaviour, add `globalConfig` to ignored files in watch mode in the Jest configuration
+```bash
+FIRESTORE_EMULATOR_HOST=localhost:8080 jest
+```
 
-```js
-// jest.config.js
-module.exports = {
-  watchPathIgnorePatterns: ['globalConfig'],
-};
+Firebase's `emulators:exec` command sets this variable automatically, so you can run tests using it as well:
+
+```bash
+firebase emulators:exec "jest"
 ```
 
 ## Misc
