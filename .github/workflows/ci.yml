@@ -30,7 +30,8 @@ jobs:
       - name: Check Prettier Formatting
         run: yarn prettier:check
 
-      - name: Testing
-        run: |
-          yarn test
-          yarn test:separate-instances
+      - name: Testing with Shared DB
+        run: yarn test:separate-instances
+
+      - name: Testing with separate instances
+        run: yarn test:separate-instances
